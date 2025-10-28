@@ -1,0 +1,80 @@
+# Конфигурация для Divoom Plant Monitor
+
+# Настройки Prometheus
+prometheus:
+  url: "https://prometheus.artfaal.ru"
+  metric: "tuya_plant_humidity"
+  query_interval: 30  # Интервал обновления данных (секунды)
+
+# Настройки Divoom
+divoom:
+  ip_address: "192.168.2.242"
+  display_size: 64  # Размер дисплея (64x64)
+
+# Настройки ротации
+rotation:
+  interval: 5  # Интервал смены растений (секунды)
+
+# Пути
+paths:
+  images_dir: "./images"  # Папка с изображениями растений
+  # Изображения должны называться по имени растения: Алла.png, Гюзель.png и т.д.
+
+# Настройки отображения
+display:
+  # Настройки шрифта для имени растения
+  name_font:
+    size: 10
+    color: [255, 255, 255]  # RGB (белый)
+    stroke_width: 1  # Толщина обводки (0 = без обводки)
+    stroke_color: [100, 100, 100]  # RGB цвет обводки (серый)
+    position: [2, 52]  # Позиция (x, y) - верхний левый угол
+    font_path: ./fonts/LanaPixel.ttf  # Путь к TTF шрифту (null = системный по умолчанию)
+
+  # Настройки шрифта для влажности
+  humidity_font:
+    size: 14
+    color: [100, 200, 255]  # RGB (светло-голубой) - используется только если dynamic_color: false
+    stroke_width: 1  # Толщина обводки
+    stroke_color: [100, 100, 100]  # RGB цвет обводки (серый)
+    position: [40, 48]  # Позиция (x, y) - внизу экрана
+    font_path: ./fonts/NorthrupExtended.ttf  # Путь к TTF шрифту (null = системный по умолчанию)
+
+    # Динамическое изменение цвета в зависимости от порогов влажности
+    dynamic_color: true  # Включить динамический выбор цвета
+    colors:
+      low: [255, 50, 50]      # RGB (красный) - влажность ниже min
+      normal: [50, 255, 100]  # RGB (зеленый) - между min и max
+      high: [100, 150, 255]   # RGB (синий) - выше max
+
+  # Настройки отображения времени и даты
+  datetime:
+    enabled: true  # Включить/выключить отображение времени и даты
+
+    # Настройки времени (23:00)
+    time:
+      size: 14
+      color: [255, 255, 255]  # RGB (светло-серый)
+      stroke_width: 1
+      stroke_color: [50, 50, 50]  # RGB (темно-серый)
+      position: [33, 2]  # Позиция (x, y)
+      font_path: ./fonts/LanaPixel.ttf  # Путь к TTF шрифту (null = системный по умолчанию)
+
+    # Настройки даты (24 апр)
+    date:
+      size: 9
+      color: [255, 255, 255]  # RGB (светло-серый)
+      stroke_width: 1
+      stroke_color: [50, 50, 50]  # RGB (темно-серый)
+      position: [2, 6]  # Позиция (x, y)
+      font_path: ./fonts/LanaPixel.ttf  # Путь к TTF шрифту (null = системный по умолчанию)
+
+  # Настройки фонового изображения
+  background:
+    enabled: true
+    default_image: null  # Если изображение не найдено, показать черный фон
+
+# Логирование
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "[%(asctime)s] %(levelname)s: %(message)s"
