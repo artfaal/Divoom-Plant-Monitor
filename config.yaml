@@ -4,7 +4,7 @@
 prometheus:
   url: "https://prometheus.artfaal.ru"
   metric: "tuya_plant_humidity"
-  query_interval: 30  # Интервал обновления данных (секунды)
+  query_interval: 60  # Интервал обновления данных (секунды)
 
 # Настройки Divoom
 divoom:
