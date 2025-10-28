@@ -57,8 +57,8 @@ display:
       color: [255, 255, 255]  # RGB (светло-серый)
       stroke_width: 1
       stroke_color: [50, 50, 50]  # RGB (темно-серый)
-      position: [29, 2]  # Позиция (x, y)
-#      font_path: ./fonts/LanaPixel.ttf  # Путь к TTF шрифту (null = системный по умолчанию)
+      position: [33, 2]  # Позиция (x, y)
+      font_path: ./fonts/LanaPixel.ttf  # Путь к TTF шрифту (null = системный по умолчанию)
 
     # Настройки даты (24 апр)
     date:
