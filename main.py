@@ -116,10 +116,11 @@ def main():
             if plants_data:
                 plant = plants_data[plant_index]
 
+                status_text = "online" if plant['is_online'] else f"OFFLINE ({plant['time_since_update']}s)"
                 logger.info(
                     f"Отображение [{plant_index + 1}/{len(plants_data)}]: "
                     f"{plant['device_name']} - {plant['humidity']}% "
-                    f"[min: {plant['threshold_min']}, max: {plant['threshold_max']}]"
+                    f"[min: {plant['threshold_min']}, max: {plant['threshold_max']}] [{status_text}]"
                 )
 
                 success = display_manager.display_plant(
@@ -130,7 +131,8 @@ def main():
                     background_enabled=background_enabled,
                     threshold_min=plant['threshold_min'],
                     threshold_max=plant['threshold_max'],
-                    datetime_config=datetime_config
+                    datetime_config=datetime_config,
+                    is_online=plant['is_online']
                 )
 
                 if not success:

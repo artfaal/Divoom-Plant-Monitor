@@ -5,6 +5,7 @@
 import requests
 from typing import Dict, List, Optional
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,8 @@ class PrometheusClient:
                     'device_name': 'Алла',
                     'humidity': 54,
                     'threshold_min': 30,
-                    'threshold_max': 80
+                    'threshold_max': 80,
+                    'is_online': True
                 },
                 ...
             ]
@@ -83,9 +85,13 @@ class PrometheusClient:
         threshold_min_data = self.query("tuya_plant_humidity_threshold_min")
         threshold_max_data = self.query("tuya_plant_humidity_threshold_max")
 
+        # Получаем timestamp последнего успешного обновления (общая метрика)
+        last_success_data = self.query("tuya_exporter_last_success_timestamp")
+
         # Создаем словари для быстрого поиска по device_id
         thresholds_min = {}
         thresholds_max = {}
+        last_success_timestamp = 0
 
         if threshold_min_data:
             for item in threshold_min_data.get('data', {}).get('result', []):
@@ -101,9 +107,22 @@ class PrometheusClient:
                 if device_id and value[1]:
                     thresholds_max[device_id] = int(float(value[1]))
 
+        # Получаем общий timestamp последнего успешного обновления
+        if last_success_data:
+            results = last_success_data.get('data', {}).get('result', [])
+            if results:
+                value = results[0].get('value', [None, None])
+                if value[1]:
+                    last_success_timestamp = float(value[1])
+
         # Собираем данные о растениях
         result = humidity_data.get('data', {}).get('result', [])
         plants = []
+        current_time = time.time()
+
+        # Проверяем, онлайн ли экспортер (общая проверка для всех устройств)
+        time_since_update = current_time - last_success_timestamp if last_success_timestamp > 0 else 999999
+        is_online = time_since_update <= 120  # Онлайн если обновлялось менее 120 сек назад
 
         for item in result:
             try:
@@ -118,13 +137,17 @@ class PrometheusClient:
                     'threshold_min': thresholds_min.get(device_id, 30),  # По умолчанию 30
                     'threshold_max': thresholds_max.get(device_id, 80),  # По умолчанию 80
                     'instance': labels.get('instance', ''),
-                    'job': labels.get('job', '')
+                    'job': labels.get('job', ''),
+                    'is_online': is_online,
+                    'last_success_timestamp': last_success_timestamp,
+                    'time_since_update': int(time_since_update)
                 }
 
                 plants.append(plant)
+                status = "online" if is_online else f"OFFLINE ({int(time_since_update)}s)"
                 logger.debug(
                     f"Получены данные растения: {plant['device_name']} - {plant['humidity']}% "
-                    f"(min: {plant['threshold_min']}, max: {plant['threshold_max']})"
+                    f"(min: {plant['threshold_min']}, max: {plant['threshold_max']}) [{status}]"
                 )
 
             except (ValueError, IndexError, KeyError) as e:

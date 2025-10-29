@@ -187,7 +187,8 @@ class DisplayManager:
         background_enabled: bool = True,
         threshold_min: Optional[int] = None,
         threshold_max: Optional[int] = None,
-        datetime_config: Optional[dict] = None
+        datetime_config: Optional[dict] = None,
+        is_online: bool = True
     ) -> Image.Image:
         """
         Создать изображение с информацией о растении
@@ -201,6 +202,7 @@ class DisplayManager:
             threshold_min: Минимальный порог влажности (опционально)
             threshold_max: Максимальный порог влажности (опционально)
             datetime_config: Конфиг для отображения времени и даты (опционально)
+            is_online: Статус доступности датчика (по умолчанию True)
 
         Returns:
             PIL Image готовое для отображения
@@ -231,21 +233,28 @@ class DisplayManager:
             stroke_fill=name_stroke_color
         )
 
-        # Рисуем влажность
-        humidity_text = f"{humidity}%"
+        # Рисуем влажность или ERR (если датчик офлайн)
         humidity_font = self._get_font(humidity_config['size'], humidity_config.get('font_path'))
-
-        # Определяем цвет на основе порогов (если они переданы)
-        if threshold_min is not None and threshold_max is not None:
-            humidity_color = self._get_humidity_color(
-                humidity, threshold_min, threshold_max, humidity_config
-            )
-        else:
-            humidity_color = tuple(humidity_config['color'])
-
         humidity_pos = tuple(humidity_config['position'])
         humidity_stroke_width = humidity_config.get('stroke_width', 0)
         humidity_stroke_color = tuple(humidity_config.get('stroke_color', [0, 0, 0]))
+
+        if is_online:
+            # Нормальное отображение влажности
+            humidity_text = f"{humidity}%"
+
+            # Определяем цвет на основе порогов (если они переданы)
+            if threshold_min is not None and threshold_max is not None:
+                humidity_color = self._get_humidity_color(
+                    humidity, threshold_min, threshold_max, humidity_config
+                )
+            else:
+                humidity_color = tuple(humidity_config['color'])
+        else:
+            # Датчик офлайн - показываем ERR красным цветом
+            humidity_text = "ERR"
+            humidity_color = (255, 0, 0)  # Красный цвет
+
         draw.text(
             humidity_pos,
             humidity_text,
@@ -307,7 +316,8 @@ class DisplayManager:
         background_enabled: bool = True,
         threshold_min: Optional[int] = None,
         threshold_max: Optional[int] = None,
-        datetime_config: Optional[dict] = None
+        datetime_config: Optional[dict] = None,
+        is_online: bool = True
     ) -> bool:
         """
         Отобразить информацию о растении на дисплее
@@ -321,6 +331,7 @@ class DisplayManager:
             threshold_min: Минимальный порог влажности (опционально)
             threshold_max: Максимальный порог влажности (опционально)
             datetime_config: Конфиг для отображения времени и даты (опционально)
+            is_online: Статус доступности датчика (по умолчанию True)
 
         Returns:
             True если успешно, False в случае ошибки
@@ -328,7 +339,7 @@ class DisplayManager:
         try:
             img = self.create_plant_image(
                 plant_name, humidity, name_config, humidity_config,
-                background_enabled, threshold_min, threshold_max, datetime_config
+                background_enabled, threshold_min, threshold_max, datetime_config, is_online
             )
 
             # Отправляем изображение на дисплей
