@@ -194,12 +194,12 @@ nano ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/artfaal/PROJECTS/divoom/venv/bin/python</string>
-        <string>/Users/artfaal/PROJECTS/divoom/main.py</string>
+        <string>/Users/southnet-mac-server/PROJECTS/divoom/venv/bin/python</string>
+        <string>/Users/southnet-mac-server/PROJECTS/divoom/main.py</string>
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/artfaal/PROJECTS/divoom</string>
+    <string>/Users/southnet-mac-server/PROJECTS/divoom</string>
 
     <key>RunAtLoad</key>
     <true/>
@@ -207,11 +207,14 @@ nano ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
     <key>KeepAlive</key>
     <true/>
 
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
     <key>StandardOutPath</key>
-    <string>/Users/artfaal/PROJECTS/divoom/logs/stdout.log</string>
+    <string>/Users/southnet-mac-server/PROJECTS/divoom/logs/stdout.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/artfaal/PROJECTS/divoom/logs/stderr.log</string>
+    <string>/Users/southnet-mac-server/PROJECTS/divoom/logs/stderr.log</string>
 
     <key>EnvironmentVariables</key>
     <dict>
@@ -221,6 +224,8 @@ nano ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
 </dict>
 </plist>
 ```
+
+**Примечание:** `ThrottleInterval` задает минимальное время (в секундах) между перезапусками сервиса при падении, что предотвращает бесконечные попытки перезапуска.
 
 Загрузка и управление сервисом:
 

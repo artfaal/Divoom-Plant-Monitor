@@ -102,15 +102,27 @@ def main():
             # Обновляем данные из Prometheus если прошло достаточно времени
             if current_time - last_data_update >= query_interval or not plants_data:
                 logger.info("Обновление данных из Prometheus...")
-                plants_data = prometheus_client.get_plant_humidity(metric)
+                try:
+                    new_plants_data = prometheus_client.get_plant_humidity(metric)
 
-                if not plants_data:
-                    logger.warning("Не удалось получить данные о растениях. Повтор через 10 сек...")
-                    time.sleep(10)
-                    continue
-
-                last_data_update = current_time
-                plant_index = 0  # Сбрасываем индекс при обновлении данных
+                    if new_plants_data:
+                        plants_data = new_plants_data
+                        last_data_update = current_time
+                        plant_index = 0  # Сбрасываем индекс при обновлении данных
+                    elif not plants_data:
+                        # Если нет новых данных и вообще нет данных - ждем
+                        logger.warning("Не удалось получить данные о растениях. Повтор через 30 сек...")
+                        time.sleep(30)
+                        continue
+                    else:
+                        # Если нет новых данных, но есть старые - продолжаем с ними
+                        logger.warning("Не удалось обновить данные, используем предыдущие")
+                except Exception as e:
+                    logger.error(f"Ошибка при обновлении данных из Prometheus: {e}")
+                    if not plants_data:
+                        logger.warning("Нет данных для отображения. Повтор через 30 сек...")
+                        time.sleep(30)
+                        continue
 
             # Отображаем текущее растение
             if plants_data:
@@ -146,12 +158,17 @@ def main():
 
     except KeyboardInterrupt:
         logger.info("\n\nОстановка по запросу пользователя")
-        display_manager.clear()
+        try:
+            display_manager.clear()
+        except Exception as e:
+            logger.error(f"Ошибка при очистке дисплея: {e}")
 
     except Exception as e:
-        logger.error(f"Неожиданная ошибка: {e}", exc_info=True)
-        display_manager.clear()
-        sys.exit(1)
+        logger.error(f"Критическая ошибка в главном цикле: {e}", exc_info=True)
+        logger.info("Попытка перезапуска через 30 секунд...")
+        time.sleep(30)
+        # Перезапускаем main()
+        main()
 
     logger.info("Divoom Plant Monitor завершен")
 

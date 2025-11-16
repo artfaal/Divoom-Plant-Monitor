@@ -4,6 +4,7 @@
 
 import os
 import logging
+import socket
 from typing import Optional, Tuple
 from pathlib import Path
 from datetime import datetime
@@ -12,6 +13,9 @@ from PIL import Image, ImageDraw, ImageFont
 from pixoo import Pixoo
 
 logger = logging.getLogger(__name__)
+
+# Устанавливаем глобальный таймаут для всех socket операций (5 секунд)
+socket.setdefaulttimeout(5.0)
 
 # Словарь русских названий месяцев (сокращенные)
 MONTH_NAMES_RU = {
@@ -346,9 +350,18 @@ class DisplayManager:
             self.pixoo.draw_image(img)
             self.pixoo.push()
 
-            logger.info(f"Отображено: {plant_name} - {humidity}%")
+            logger.debug(f"Отображено: {plant_name} - {humidity}%")
             return True
 
+        except socket.timeout:
+            logger.error(f"Ошибка при отображении растения {plant_name}: Timeout соединения с Divoom")
+            return False
+        except ConnectionError as e:
+            logger.error(f"Ошибка при отображении растения {plant_name}: Ошибка соединения - {e}")
+            return False
+        except OSError as e:
+            logger.error(f"Ошибка при отображении растения {plant_name}: Сетевая ошибка - {e}")
+            return False
         except Exception as e:
             logger.error(f"Ошибка при отображении растения {plant_name}: {e}")
             return False
