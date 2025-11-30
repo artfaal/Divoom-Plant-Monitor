@@ -155,6 +155,7 @@ class PrometheusClient:
                 continue
 
         logger.info(f"Получено данных о {len(plants)} растениях")
+        plants.sort(key=lambda p: p['device_name'])  # Сортируем по имени для предсказуемого порядка
         return plants
 
 
