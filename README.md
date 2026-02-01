@@ -233,18 +233,17 @@ nano ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
 # Создать папку для логов
 mkdir -p /Users/artfaal/PROJECTS/divoom/logs
 
-# Загрузить и запустить
-launchctl load ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
+# Запустить
+./service.sh start
 
 # Проверить статус
-launchctl list | grep divoom
+./service.sh status
 
 # Остановить
-launchctl unload ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
+./service.sh stop
 
 # Перезапустить после изменений
-launchctl unload ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
-launchctl load ~/Library/LaunchAgents/com.divoom.plantmonitor.plist
+./service.sh restart
 
 # Просмотр логов
 tail -f /Users/artfaal/PROJECTS/divoom/logs/stdout.log
