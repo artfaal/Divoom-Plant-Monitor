@@ -1,0 +1,13 @@
+.git/
+.gitignore
+venv/
+__pycache__/
+*.pyc
+*.pyo
+logs/
+.DS_Store
+.claude/
+README.md
+*.plist
+service.sh
+tests/
