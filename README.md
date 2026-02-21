@@ -158,7 +158,7 @@ divoom/
 │   └── display_manager.py
 ├── images/                    # Фоновые изображения растений 64x64
 ├── fonts/                     # TTF шрифты
-└── logs/                      # Логи (volume)
+└── logs/                      # Логи (volume, docker json-file 5m×3)
 ```
 
 ## Troubleshooting
