@@ -5,7 +5,8 @@ services:
     build: .
     image: divoom:latest
     container_name: divoom
-    restart: unless-stopped
+    profiles: [plants]
+    restart: "no"
     environment:
       - TZ=Europe/Moscow
       - PYTHONUNBUFFERED=1

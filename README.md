@@ -2,6 +2,19 @@
 
 Монитор растений для Divoom Pixoo 64 с отображением влажности из Prometheus.
 
+## Домашняя установка
+
+Рабочий экран рамки — [Divoom Labirint](../Divoom_labirint/README.md).
+Проект растений отложен: исходники, настройки, изображения, контейнер и образ
+сохранены. Сервис Compose включается только через профиль `plants`,
+политика перезапуска — `restart: "no"`; автоматического запуска после перезагрузки нет.
+Обычный `docker compose up -d` его не включает.
+
+Перед возвратом растений остановить контроллер лабиринта и отключить его автозапуск:
+[порядок переключения](../Divoom_labirint/docs/deployment.md#возврат-растений).
+Телеметрия растений и CO2 и графики продолжают работать →
+[INFRA-DOCS](../INFRA-DOCS/services/monitoring.md).
+
 ## Описание
 
 Получает данные о влажности растений из Prometheus (метрики от датчиков Tuya), обрабатывает и отображает их на Divoom Pixoo 64 с цветовой индикацией состояния, временем и датой.
@@ -49,23 +62,23 @@ divoom:
 ### 3. Запуск
 
 ```bash
-docker compose up -d
+docker compose --profile plants up -d
 ```
 
 ## Управление
 
 ```bash
 # Статус
-docker compose ps
+docker compose --profile plants ps
 
 # Логи (live)
-docker compose logs -f
+docker compose --profile plants logs -f
 
 # Остановить
-docker compose down
+docker compose --profile plants stop
 
 # Обновить код и перезапустить
-git pull && docker compose up -d --build
+git pull && docker compose --profile plants up -d --build
 ```
 
 ## Конфигурация (`config.yaml`)
@@ -166,7 +179,7 @@ divoom/
 **Divoom не отвечает**
 - Проверьте IP в `config.yaml`
 - Убедитесь что Divoom и Pi в одной сети
-- Проверьте логи: `docker compose logs -f`
+- Проверьте логи: `docker compose --profile plants logs -f`
 
 **Данные не обновляются**
 - Проверьте доступность Prometheus по URL из конфига
@@ -174,7 +187,7 @@ divoom/
 - Проверьте что [tuya-exporter](https://github.com/artfaal/tuya-exporter) запущен и отправляет данные
 
 **Текст не читается на фоне**
-- Увеличьте `stroke_width: 2` в `config.yaml`
+- Увеличьте `stroke_width` до `2` в `config.yaml`
 - Измените `stroke_color` на контрастный
 
 ## Лицензия
